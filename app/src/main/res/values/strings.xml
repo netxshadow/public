@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Game</string>
+    <string name="splash">Splash Screen</string>
+    <string name="game">Game Screen</string>
+    <string name="menu">Menu Screen</string>
+    <string name="help">Help Screen</string>
+    <string name="scores">Scores Screen</string>
+    <string name="settings">Settings Screen</string>
+</resources>

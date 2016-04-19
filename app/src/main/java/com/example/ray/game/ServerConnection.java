@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 public class ServerConnection {
 
-    final String GAME_LOGS  =   "gameLogs";
+    final String GAME_LOGS  =   "GAME_LOGS";
     final String strUrl = "http://game.nmi.com.ua/gameplay.php"; //url to API
 
     public String request(String params){
@@ -47,9 +47,7 @@ public class ServerConnection {
             String result = "";
 
             try {
-
                 URL url = new URL(strUrl);
-
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(15000);
                 urlConnection.setConnectTimeout(15000);

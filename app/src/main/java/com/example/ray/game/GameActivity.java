@@ -26,13 +26,14 @@ public class GameActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
         tablelayout = (TableLayout) findViewById(R.id.main_1);
+        tvP1    =   (TextView)  findViewById(R.id.tvP1);
+        tvSystem = (TextView) findViewById(R.id.tvSystem);
 
         buildGameField();
 
         gameplay = new Gameplay();
         gameplay.setGameConnect();
         gameplay.setGamePlay();
-
 
     }
 
@@ -73,7 +74,7 @@ public class GameActivity extends BaseActivity {
     {
         private int x = 0;
         private int y = 0;
-        private int value = 0;
+        private int value = 1;
 
         public Listener(int x, int y, int value)
         {
@@ -86,12 +87,14 @@ public class GameActivity extends BaseActivity {
         {
             Button button = (Button) view;
 
-            Log.d(GAME_LOGS, "Cell: x=" + x + " y=" + y + " Value: " + value);
+            if(gameplay.setPlayerMove(value).equals("ok")) {
+                Log.d(GAME_LOGS, "Cell: x=" + x + " y=" + y + " Value: " + value);
+                tvP1.setText(value + "");
+                button.setVisibility(View.INVISIBLE);
+            }else{
+                Toast.makeText(GameActivity.this, "Wait for a second...", Toast.LENGTH_SHORT).show();
+            }
 
-            tvP1    =   (TextView)  findViewById(R.id.tvP1);
-            tvP1.setText(value + "");
-
-            button.setVisibility(View.INVISIBLE);
         }
     }
 

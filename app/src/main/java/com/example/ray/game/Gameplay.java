@@ -10,20 +10,32 @@ public class Gameplay {
     String gameID;
     String playerID;
     String playerName;
-    String gameStatus;
-    Boolean gamePlay = false;
+    String response;
     String result;
+    String s0, p1, p2;
+    Boolean gamePlay = false;
     ServerConnection sc;
     Player player;
 
-    public static final String GAME_STARTED      =   "GAME_STARTED";
-    public static final String GAME_FINISHED     =   "GAME_FINISHED";
     public static final int GAME_CHECK_TIMEOUT = 1;
 
     public void setGameConnect()
     {
         sc = new ServerConnection();
-        parseResponse("gameConnect", sc.request("actionID=gameConnect"));
+
+        response = sc.request("actionID=gameConnect");
+
+        try {
+
+            JSONObject dataJsonObj = new JSONObject(response);
+            this.gameID = dataJsonObj.getString("gameID");
+            this.playerName = dataJsonObj.getString("playerName");
+            this.playerID = dataJsonObj.getString("playerID");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         player = new Player(playerID, playerName);
         player.setCanMove(true);
         gamePlay = true;
@@ -32,22 +44,18 @@ public class Gameplay {
 
     public void setGamePlay()
     {
-
-        while(gamePlay == true)
+        while(gamePlay)
         {
-
-            gameStatus = parseResponse("checkGameStatus", sc.request("actionID=checkGameStatus&gameID=" + gameID));
-
-            switch(gameStatus)
-            {
-                case GAME_STARTED:
-                    break;
-                case GAME_FINISHED:
-                    break;
-            }
-
-
+            response = sc.request("actionID=checkGamePlay&gameID=" + gameID);
             try {
+                try {
+                    JSONObject dataJsonObj = new JSONObject(response);
+                    this.s0 = dataJsonObj.getString("s0");
+                    this.p1 = dataJsonObj.getString("p1");
+                    this.p2 = dataJsonObj.getString("p2");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 TimeUnit.SECONDS.sleep(GAME_CHECK_TIMEOUT);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -61,27 +69,25 @@ public class Gameplay {
         this.gamePlay = false;
     }
 
-    public String parseResponse(String action, String response){
-
-        JSONObject dataJsonObj = null;
-
-        switch(action){
-            case "gameConnect":
-                try {
-
-                    dataJsonObj = new JSONObject(response);
-                    this.gameID = dataJsonObj.getString("gameID");
-                    this.playerName = dataJsonObj.getString("playerName");
-                    this.playerID = dataJsonObj.getString("playerID");
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+    public String setPlayerMove(Integer value){
+        if(player.getCanMove()){
+            response = sc.request("actionID=playerMove&player=" + playerID + "&value=" + value);
+            try {
+                JSONObject dataJsonObj = new JSONObject(response);
+                if(dataJsonObj.getString("result").equals("ok")){
+                    result = "ok";
+                    player.setCanMove(false);
+                }else{
+                    result = "error";
                 }
-                break;
-            case "checkGameStatus":
-
-                break;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else{
+            result = "wait";
         }
+
+        result = "ok";
 
         return result;
     }

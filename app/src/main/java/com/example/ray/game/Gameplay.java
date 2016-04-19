@@ -16,7 +16,7 @@ public class Gameplay {
     ServerConnection sc;
     Player player;
 
-    public static final String GAME_STARTED      =   "GAME_STARTED"; //const for game status
+    public static final String GAME_STARTED      =   "GAME_STARTED";
     public static final String GAME_FINISHED     =   "GAME_FINISHED";
     public static final int GAME_CHECK_TIMEOUT = 1;
 

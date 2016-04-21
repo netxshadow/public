@@ -1,6 +1,5 @@
 package com.example.ray.game;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,11 +7,9 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class GameActivity extends BaseActivity {
 
-    final String GAME_LOGS  =   "gameLogs";
     final int ROWS_COUNT    =   5;
     final int CELLS_COUNT   =   2;
     //private Button[][] buttons  =   new Button[2][5];
@@ -31,9 +28,19 @@ public class GameActivity extends BaseActivity {
 
         buildGameField();
 
-        gameplay = new Gameplay();
-        gameplay.setGameConnect();
-        gameplay.setGamePlay();
+        ServerConnection sc = new ServerConnection();
+
+        String response = sc.sendRequestToServer("actionID=gameConnect");
+
+        if(response.toString().length() > 0){
+
+            Log.d(GAME_LOGS, response);
+
+        }else{
+
+            Log.d(GAME_LOGS, "no fucking response");
+
+        }
 
     }
 
@@ -87,13 +94,9 @@ public class GameActivity extends BaseActivity {
         {
             Button button = (Button) view;
 
-            if(gameplay.setPlayerMove(value).equals("ok")) {
-                Log.d(GAME_LOGS, "Cell: x=" + x + " y=" + y + " Value: " + value);
-                tvP1.setText(value + "");
-                button.setVisibility(View.INVISIBLE);
-            }else{
-                Toast.makeText(GameActivity.this, "Wait for a second...", Toast.LENGTH_SHORT).show();
-            }
+            Log.d(GAME_LOGS, "Cell: x=" + x + " y=" + y + " Value: " + value);
+            tvP1.setText(value + "");
+            button.setVisibility(View.INVISIBLE);
 
         }
     }

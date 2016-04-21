@@ -32,15 +32,7 @@ public class GameActivity extends BaseActivity {
 
         String response = sc.sendRequestToServer("actionID=gameConnect");
 
-        if(response.toString().length() > 0){
-
-            Log.d(GAME_LOGS, response);
-
-        }else{
-
-            Log.d(GAME_LOGS, "no fucking response");
-
-        }
+        Log.d(GAME_LOGS, "response from server: " + response);
 
     }
 

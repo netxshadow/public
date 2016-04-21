@@ -1,5 +1,7 @@
 package com.example.ray.game;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,11 +13,15 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class ServerConnection {
+
     public static final String GAME_SERVER = "http://game.nmi.com.ua/gameplay.php";
+
     public String sendRequestToServer(String params){
+
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String result = "";
+
         try {
             URL url = new URL(GAME_SERVER);
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -24,9 +30,11 @@ public class ServerConnection {
             urlConnection.setRequestMethod("POST");
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
+            urlConnection.connect();
             OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
             writer.write(params);
             writer.flush();
+
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -37,6 +45,7 @@ public class ServerConnection {
             result = buffer.toString();
             writer.close();
             reader.close();
+            urlConnection.disconnect();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {

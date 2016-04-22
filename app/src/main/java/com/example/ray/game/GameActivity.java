@@ -7,32 +7,34 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class GameActivity extends BaseActivity {
 
     final int ROWS_COUNT    =   5;
     final int CELLS_COUNT   =   2;
+    String response;
     //private Button[][] buttons  =   new Button[2][5];
 
     private TableLayout tablelayout;
     TextView tvSystem, tvP1, tvP2;
-    Gameplay gameplay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game);
         tablelayout = (TableLayout) findViewById(R.id.main_1);
-        tvP1    =   (TextView)  findViewById(R.id.tvP1);
+        tvP1 = (TextView) findViewById(R.id.tvP1);
         tvSystem = (TextView) findViewById(R.id.tvSystem);
 
         buildGameField();
 
         ServerConnection sc = new ServerConnection();
-
-        String response = sc.sendRequestToServer("actionID=gameConnect");
-
-        Log.d(GAME_LOGS, "response from server: " + response);
+        sc.request2("actionID=gameConnect");
 
     }
 

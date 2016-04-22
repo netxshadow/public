@@ -1,8 +1,10 @@
 package com.example.ray.game;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,10 +13,35 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Handler;
 
 public class ServerConnection {
 
+    String response;
+
     public static final String GAME_SERVER = "http://game.nmi.com.ua/gameplay.php";
+
+    public String request2(String params){
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                response = sendRequestToServer("actionID=gameConnect");
+            }
+        }, 0, 1000);
+        return response;
+    }
+
+    public String request1(String params){
+        String response = "";
+        ServerTask st = new ServerTask();
+        st.execute(params);
+        return response;
+    }
 
     public String sendRequestToServer(String params){
 
@@ -46,6 +73,7 @@ public class ServerConnection {
             writer.close();
             reader.close();
             urlConnection.disconnect();
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
@@ -53,6 +81,27 @@ public class ServerConnection {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Log.d("GAME_LOGS", "response from server: " + result);
+
         return result;
     }
+
+    class ServerTask extends AsyncTask<String, Void, String>{
+
+        @Override
+        protected String doInBackground(String... params) {
+            for(int i = 1; i<=10; i++) {
+                sendRequestToServer(params[0]);
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+    }
+
 }

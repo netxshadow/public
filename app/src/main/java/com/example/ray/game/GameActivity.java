@@ -1,6 +1,8 @@
 package com.example.ray.game;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +10,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,11 +22,19 @@ public class GameActivity extends BaseActivity {
 
     final int ROWS_COUNT    =   5;
     final int CELLS_COUNT   =   2;
+    final String GAME_LOGS = "GAME_LOGS";
+    ServerConnection sc = new ServerConnection();
     String response;
+    String gameID;
+    Boolean gamePlay;
+    String s0;
+    Handler h;
     //private Button[][] buttons  =   new Button[2][5];
-
     private TableLayout tablelayout;
     TextView tvSystem, tvP1, tvP2;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +46,81 @@ public class GameActivity extends BaseActivity {
 
         buildGameField();
 
-        ServerConnection sc = new ServerConnection();
-        sc.request2("actionID=gameConnect");
+        gameConnect();
 
+        gamePlay = true;
+
+        startGameLoop();
+
+    }
+
+    private void gameConnect(){
+
+        h  = new Handler(){
+            public void handleMessage(android.os.Message msg){
+                gameID = msg.obj.toString();
+            }
+        };
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                response = sc.sendRequestToServer("actionID=gameConnect");
+                gameID = getJsonValue(response, "gameID");
+                Message msg = h.obtainMessage(0, gameID);
+                h.sendMessage(msg);
+            }
+        });
+        t.start();
+
+    }
+
+    private void startGameLoop(){
+
+        h  = new Handler(){
+            public void handleMessage(android.os.Message msg){
+                tvSystem.setText(msg.obj.toString());
+            }
+        };
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(gamePlay) {
+                    response = sc.sendRequestToServer("actionID=checkGamePlay&gameID=" + gameID);
+                    if(response.equals("wait")){
+                        Log.d(GAME_LOGS, "wait for gamers connect...");
+                    }else{
+                        s0 = getJsonValue(response, "s0");
+                        Message msg = h.obtainMessage(0, s0);
+                        h.sendMessage(msg);
+                    }
+
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        t.start();
+
+    }
+
+    private void stopGameLoop(){
+        this.gamePlay = false;
+    }
+
+    private String getJsonValue(String json, String valueName){
+        String result = "";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            result = jsonObj.getString(valueName);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     private void buildGameField(){
@@ -91,6 +176,7 @@ public class GameActivity extends BaseActivity {
             Log.d(GAME_LOGS, "Cell: x=" + x + " y=" + y + " Value: " + value);
             tvP1.setText(value + "");
             button.setVisibility(View.INVISIBLE);
+            stopGameLoop();
 
         }
     }

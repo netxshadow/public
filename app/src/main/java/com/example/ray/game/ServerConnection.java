@@ -25,21 +25,8 @@ public class ServerConnection {
 
     public static final String GAME_SERVER = "http://game.nmi.com.ua/gameplay.php";
 
-    public String request2(String params){
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                response = sendRequestToServer("actionID=gameConnect");
-            }
-        }, 0, 1000);
-        return response;
-    }
+    public String request(final String params){
 
-    public String request1(String params){
-        String response = "";
-        ServerTask st = new ServerTask();
-        st.execute(params);
         return response;
     }
 
